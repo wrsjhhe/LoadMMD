@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MMD Test</title>
+    <style>
+        body {
+            background-color: #fff;
+            color: #000;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="modules/three.js"></script>
+
+    <script src="modules/mmdparser.min.js"></script>
+    <script src="modules/ammo.js"></script>
+
+    <script src="modules/TGALoader.js"></script>
+    <script src="modules/MMDLoader.js"></script>
+    <script src="modules/OutlineEffect.js"></script>
+    <script src="modules/CCDIKSolver.js"></script>
+    <script src="modules/MMDPhysics.js"></script>
+</head>
+<body>
+
+<script>
+
+    let container = document.createElement("div");
+    document.body.appendChild(container);
+
+    let scene = new THREE.Scene();
+
+    let camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+
+    let ambient = new THREE.AmbientLight( 0x666666 );
+    scene.add( ambient );
+
+    let directionalLight = new THREE.DirectionalLight( 0x887766 );
+    directionalLight.position.set( -1, 1, 1 ).normalize();
+    scene.add( directionalLight );
+
+    let renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setClearColor( new THREE.Color( 0xffffff ) );
+    container.appendChild( renderer.domElement );
+
+    let modelFile = 'models/Madoka/Meguka.pmx';
+
+    let vmdFiles = [ 'act/1/teto.vmd' ];
+  //  let vmdFiles = [ 'mmd/vmds/wavefile_v2.vmd' ];
+    let cameraFiles = [ 'mmd/vmds/wavefile_camera.vmd' ];
+    let audioFile = 'mmd/audios/wavefile_short.mp3';
+    let audioParams = { delayTime: 160 * 1 / 30 };
+
+    let effect = new THREE.OutlineEffect( renderer );
+
+    let helper = new THREE.MMDHelper();
+
+    let loader = new THREE.MMDLoader();
+
+    let clock = new THREE.Clock();
+
+    let mesh;
+
+    let ready = false;
+
+    animate();
+
+    let onProgress = function ( xhr ) {
+        if ( xhr.lengthComputable ) {
+            let percentComplete = xhr.loaded / xhr.total * 100;
+            console.log( Math.round(percentComplete, 2) + '% downloaded' );
+        }
+    };
+
+    let onError = function ( xhr ) {
+    };
+
+    loader.load(modelFile,vmdFiles,function (object) {
+
+        mesh = object;
+        helper.add(mesh);
+        helper.setAnimation(mesh);
+        helper.setPhysics(mesh);
+
+        loader.loadVmds(cameraFiles,function (vmd) {
+            helper.setCamera(camera);
+            loader.pourVmdIntoCamera(camera,vmd);
+            helper.setCameraAnimation(camera);
+
+            loader.loadAudio(audioFile,function (audio,listener) {
+                listener.position.z = 1;
+                helper.setAudio(audio,listener,audioParams);
+
+                helper.unifyAnimationDuration();
+
+                scene.add( audio );
+                scene.add( listener );
+                scene.add( mesh );
+
+                ready = true;
+
+            }, onProgress, onError)
+        }, onProgress, onError)
+    }, onProgress, onError);
+
+
+
+    function animate() {
+        requestAnimationFrame( animate );
+        render();
+    }
+
+
+
+    function render() {
+
+        if(ready ===true)
+        {
+            helper.animate( clock.getDelta() );
+            effect.render( scene, camera );
+        }
+
+
+    }
+
+
+</script>
+</body>
+</html>
