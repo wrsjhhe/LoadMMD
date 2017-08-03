@@ -69,13 +69,14 @@
 
     let ready = false;
 
-
+    let i = 0;
 
     let onProgress = function ( xhr ) {
         if ( xhr.lengthComputable ) {
             let percentComplete = xhr.loaded / xhr.total * 100;
             console.log( Math.round(percentComplete, 2) + '% downloaded' );
-            $("#progress")[0].innerHTML = Math.round(percentComplete, 2) + '% downloaded';
+            i++;
+            $("#progress")[0].innerHTML = Math.round(percentComplete, 2) + '% downloaded('+i+"/3)";
         }
     };
 
@@ -136,7 +137,7 @@ function laodMMD(modelFile,vmdFiles) {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-   
+
 
     function onWindowResize() {
 
