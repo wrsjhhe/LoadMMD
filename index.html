@@ -134,6 +134,18 @@ function laodMMD(modelFile,vmdFiles) {
 
     }
 
+    window.addEventListener( 'resize', onWindowResize, false );
+
+   
+
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        effect.setSize( window.innerWidth, window.innerHeight );
+
+    }
 
 </script>
 </body>
