@@ -24,11 +24,13 @@
     <script src="modules/MMDPhysics.js"></script>
 </head>
 <body>
+<div id = "container">
+    <label id="progress"></label>
+</div>
 
 <script>
 
-    let container = document.createElement("div");
-    document.body.appendChild(container);
+
 
     let scene = new THREE.Scene();
 
@@ -45,7 +47,7 @@
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.setClearColor( new THREE.Color( 0xffffff ) );
-    container.appendChild( renderer.domElement );
+    $("#container").append( renderer.domElement );
 
     let modelFile = 'Models/Madoka/Meguka.pmx';
 
@@ -73,6 +75,7 @@
         if ( xhr.lengthComputable ) {
             let percentComplete = xhr.loaded / xhr.total * 100;
             console.log( Math.round(percentComplete, 2) + '% downloaded' );
+            $("#progress")[0].innerHTML = Math.round(percentComplete, 2) + '% downloaded';
         }
     };
 
@@ -112,8 +115,6 @@ function laodMMD(modelFile,vmdFiles) {
         }, onProgress, onError)
     }, onProgress, onError);
 }
-
-
 
 
     function animate() {
